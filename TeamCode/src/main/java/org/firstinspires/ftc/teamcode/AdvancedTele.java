@@ -1,6 +1,5 @@
 
-package org.firstinspires.ftc.teamcode.teleop;
-
+package org.firstinspires.ftc.teamcode;
 
 
 
@@ -22,15 +21,29 @@ public class AdvancedTele extends OpMode {
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
+
+    private DcMotor rightSlide;
+    private DcMotor leftSlide;
+
+    private DcMotor slideUp;
+
+
+
+
     //private DcMotor rightSlide1;
     //private DcMotor rightSlide2;
     //private DcMotor leftSlide1;
     //private DcMotor leftSlide2;
     // private DcMotor outtake;
     //private Servo launcher;
-    private Servo claw;
+//    private Servo claw;
     //private Servo pixelDrop;
     private boolean halfPower = false;
+
+
+    //use this for max horizontal extension, should increment by one every revolution of the motor
+    // if it is greater than a certain value, the motor
+    private double extension = 0;
 
     private boolean servoIsActivated = false;
     // TODO: Set any constant values here, if necessary
@@ -49,6 +62,11 @@ public class AdvancedTele extends OpMode {
         backLeft = hardwareMap.get(DcMotor.class,"bl");
         backRight = hardwareMap.get(DcMotor.class,"br");
 
+        rightSlide = hardwareMap.get(DcMotor.class, "slideRight");
+        leftSlide = hardwareMap.get(DcMotor.class, "slideLeft");
+
+        slideUp = hardwareMap.get(DcMotor.class, "slideUp");
+
         //rightSlide1 = hardwareMap.get(DcMotor.class,"rightSlide1");
         //rightSlide2 = hardwareMap.get(DcMotor.class,"rightSlide2");
         //leftSlide1 = hardwareMap.get(DcMotor.class,"leftSlide1");
@@ -57,7 +75,8 @@ public class AdvancedTele extends OpMode {
 
         // outtake = hardwareMap.get(DcMotor.class,"outtake");
         //launcher = hardwareMap.get(Servo.class, "launcher");
-        claw = hardwareMap.get(Servo.class, "claw");
+
+        //claw = hardwareMap.get(Servo.class, "claw");
 
         // Hint: Use hardwareMap.get() method
         // Example: frontLeft = hardwareMap.get(DcMotor.class, "front_left_motor");
@@ -122,7 +141,7 @@ public class AdvancedTele extends OpMode {
         double turn = gamepad1.right_stick_x;
 
         servoIsActivated = gamepad1.a;
-        claw.setPosition(servoIsActivated?1:0);
+        //claw.setPosition(servoIsActivated?1:0);
 
             if (gamepad1.b) {
                 //launcher.setPosition(-1);
@@ -143,30 +162,31 @@ public class AdvancedTele extends OpMode {
                     strafe *= 0.5;
                     turn *= 0.5;
                 }
+
                 double flPower = power-strafe-turn;
                 double blPower = power+strafe-turn;
                 double frPower = power+strafe+turn;
                 double brPower = power-strafe+turn;
 
-
                 frontLeft.setPower(flPower);
                 backLeft.setPower(blPower);
                 backRight.setPower(brPower);
                 frontRight.setPower(frPower);
-                if (leftTrigger > 0) {
-                    //rightSlide1.setPower(leftTrigger);
-                    //rightSlide2.setPower(-leftTrigger);
-                    //leftSlide1.setPower(-leftTrigger);
-                    //leftSlide2.setPower(leftTrigger);
-                }
-                if (rightTrigger > 0) {
-                    //leftSlide1.setPower(rightTrigger);
-                    //leftSlide2.setPower(-rightTrigger);
-                    // rightSlide1.setPower(-rightTrigger);
-                    //rightSlide2.setPower(rightTrigger);
-                }
+
+                leftSlide.setPower(leftTrigger-rightTrigger);
+                rightSlide.setPower(leftTrigger-rightTrigger);
 
 
+
+                if(gamepad1.dpad_up){
+                    slideUp.setPower(0.6);
+                }
+                else if(gamepad1.dpad_down){
+                    slideUp.setPower(-0.6);
+                }
+                else{
+                    slideUp.setPower(0);
+                }
             }
 
 

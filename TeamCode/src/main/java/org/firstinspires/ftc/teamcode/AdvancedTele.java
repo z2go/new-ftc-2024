@@ -27,7 +27,7 @@ public class AdvancedTele extends OpMode {
 
     private DcMotor slideUp;
 
-
+    private Servo intake;
 
 
     //private DcMotor rightSlide1;
@@ -44,6 +44,8 @@ public class AdvancedTele extends OpMode {
     //use this for max horizontal extension, should increment by one every revolution of the motor
     // if it is greater than a certain value, the motor
     private double extension = 0;
+
+    private boolean canExtendSlides = false;
 
     private boolean servoIsActivated = false;
     // TODO: Set any constant values here, if necessary
@@ -66,6 +68,10 @@ public class AdvancedTele extends OpMode {
         leftSlide = hardwareMap.get(DcMotor.class, "slideLeft");
 
         slideUp = hardwareMap.get(DcMotor.class, "slideUp");
+
+        intake = hardwareMap.get(Servo.class, "inatke");
+
+        // TODO Add a servo called "intake" in the config and rename motors
 
         //rightSlide1 = hardwareMap.get(DcMotor.class,"rightSlide1");
         //rightSlide2 = hardwareMap.get(DcMotor.class,"rightSlide2");
@@ -173,16 +179,26 @@ public class AdvancedTele extends OpMode {
                 backRight.setPower(brPower);
                 frontRight.setPower(frPower);
 
-                leftSlide.setPower(leftTrigger-rightTrigger);
-                rightSlide.setPower(leftTrigger-rightTrigger);
+                leftSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : 0);
+                rightSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : 0);
 
-
+                if (gamepad1.rightBumper){
+                    intake.setPosition(1);
+                }
+                else if (gamepad1.leftBumper){
+                    intake.setPosition(-1);
+                }
+                else {
+                    intake.setPosition(0);
+                }
 
                 if(gamepad1.dpad_up){
                     slideUp.setPower(0.6);
+                    canExtendSlides = false;
                 }
                 else if(gamepad1.dpad_down){
                     slideUp.setPower(-0.6);
+                    canExtendSlides = true;
                 }
                 else{
                     slideUp.setPower(0);

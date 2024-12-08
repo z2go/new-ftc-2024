@@ -182,10 +182,10 @@ public class AdvancedTele extends OpMode {
                 leftSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : 0);
                 rightSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : 0);
 
-                if (gamepad1.rightBumper){
+                if (gamepad1.right_bumper){
                     intake.setPosition(1);
                 }
-                else if (gamepad1.leftBumper){
+                else if (gamepad1.left_bumper){
                     intake.setPosition(-1);
                 }
                 else {

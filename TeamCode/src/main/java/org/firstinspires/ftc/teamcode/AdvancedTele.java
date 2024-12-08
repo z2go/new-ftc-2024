@@ -43,7 +43,6 @@ public class AdvancedTele extends OpMode {
 
     //use this for max horizontal extension, should increment by one every revolution of the motor
     // if it is greater than a certain value, the motor
-    private double extension = 0;
 
     private boolean canExtendSlides = false;
 
@@ -69,7 +68,7 @@ public class AdvancedTele extends OpMode {
 
         slideUp = hardwareMap.get(DcMotor.class, "slideUp");
 
-        intake = hardwareMap.get(Servo.class, "inatke");
+        intake = hardwareMap.get(Servo.class, "intake");
 
         // TODO Add a servo called "intake" in the config and rename motors
 
@@ -98,6 +97,7 @@ public class AdvancedTele extends OpMode {
         backRight.setDirection(DcMotor.Direction.REVERSE);
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
 
+        leftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
         //rightSlide1.setDirection(DcMotor.Direction.FORWARD);
         //rightSlide2.setDirection(DcMotor.Direction.FORWARD);
         //leftSlide1.setDirection(DcMotor.Direction.FORWARD);
@@ -169,10 +169,10 @@ public class AdvancedTele extends OpMode {
                     turn *= 0.5;
                 }
 
-                double flPower = power-strafe-turn;
-                double blPower = power+strafe-turn;
-                double frPower = power+strafe+turn;
-                double brPower = power-strafe+turn;
+                double flPower = power+strafe-turn;
+                double blPower = power-strafe-turn;
+                double frPower = power-strafe+turn;
+                double brPower = power+strafe+turn;
 
                 frontLeft.setPower(flPower);
                 backLeft.setPower(blPower);
@@ -186,10 +186,10 @@ public class AdvancedTele extends OpMode {
                     intake.setPosition(1);
                 }
                 else if (gamepad1.left_bumper){
-                    intake.setPosition(-1);
+                    intake.setPosition(0);
                 }
                 else {
-                    intake.setPosition(0);
+                    intake.setPosition(0.5);
                 }
 
                 if(gamepad1.dpad_up){

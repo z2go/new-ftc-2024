@@ -40,7 +40,8 @@ public class AdvancedTele extends OpMode {
     //private Servo pixelDrop;
     private boolean halfPower = false;
 
-
+    private boolean lastRightBumper = false;
+    private boolean clawClosed = false;
     //use this for max horizontal extension, should increment by one every revolution of the motor
     // if it is greater than a certain value, the motor
 
@@ -179,25 +180,23 @@ public class AdvancedTele extends OpMode {
                 backRight.setPower(brPower);
                 frontRight.setPower(frPower);
 
-                leftSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : 0);
-                rightSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : 0);
+                leftSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : leftTrigger);
+                rightSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : leftTrigger);
 
-                if (gamepad1.right_bumper){
-                    intake.setPosition(1);
+                if (gamepad1.right_bumper && !lastRightBumper) {
+                    clawClosed = !clawClosed;
                 }
-                else if (gamepad1.left_bumper){
-                    intake.setPosition(0);
-                }
-                else {
-                    intake.setPosition(0.5);
-                }
+
+                lastRightBumper = gamepad1.right_bumper;
+
+                intake.setPosition(clawClosed?1:0);
 
                 if(gamepad1.dpad_up){
-                    slideUp.setPower(0.6);
+                    slideUp.setPower(0.4);
                     canExtendSlides = false;
                 }
                 else if(gamepad1.dpad_down){
-                    slideUp.setPower(-0.6);
+                    slideUp.setPower(-0.8);
                     canExtendSlides = true;
                 }
                 else{

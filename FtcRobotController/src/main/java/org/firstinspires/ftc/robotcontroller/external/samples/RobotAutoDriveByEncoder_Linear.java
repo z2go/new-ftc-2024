@@ -85,6 +85,8 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
     static final double     DRIVE_SPEED             = 0.6;
     static final double     TURN_SPEED              = 0.5;
 
+
+
     @Override
     public void runOpMode() {
 
@@ -132,6 +134,7 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
      *  2) Move runs out of time
      *  3) Driver stops the OpMode running.
      */
+
     public void encoderDrive(double speed,
                              double leftInches, double rightInches,
                              double timeoutS) {

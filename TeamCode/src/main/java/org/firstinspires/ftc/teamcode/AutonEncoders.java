@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Auton;
+package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -33,18 +32,13 @@ public class AutonEncoders extends LinearOpMode {
     DcMotor rightBack;
 
 
-    //The distance we want to travel, the speed we want to move at, and the distance translated into
-    //an encoder target
-    double dist;
-    double power;
-    int target;
-
-    String direc;
-
     private ElapsedTime runtime = new ElapsedTime();
 
-
     public void HardwareStart() {
+        leftFront  = hardwareMap.get(DcMotor.class, "fl");
+        rightFront = hardwareMap.get(DcMotor.class, "fr");
+        leftBack = hardwareMap.get(DcMotor.class, "bf");
+        rightBack = hardwareMap.get(DcMotor.class, "br");
 
         telemetry.addData("Object Creation", "Start");
         telemetry.update();
@@ -55,6 +49,7 @@ public class AutonEncoders extends LinearOpMode {
         telemetry.update();
 
     }
+
     public void runOpMode() {
 
         //this might need to be redone between different times when you use the encoder drive method:
@@ -63,23 +58,26 @@ public class AutonEncoders extends LinearOpMode {
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
         //put the specific encoder drive stuff w the measurments that we want here:
 
     }
 
-    public void encoderDrive(double timeout) {
+
+    public void encoderDrive(double timeout, double dist, double power, int target, String direc) {
         double ROTATIONS = dist / (Math.PI * WHEEL_DIAMETER_INCHES);
         /*if(direc.equals("forward") || direc.equals("backward")) {
             target = leftFront.getCurrentPosition() + (int) (dist * COUNTS_PER_INCH);
         }*/
+
         double counts =  COUNTS_PER_MOTOR_REV * ROTATIONS * DRIVE_GEAR_REDUCTION;
+
         target = leftFront.getCurrentPosition() + (int) counts;
+
         switch (direc) {
             case "Forward": // robot will move forward
                 leftFront.setTargetPosition((int) target);
@@ -118,6 +116,7 @@ public class AutonEncoders extends LinearOpMode {
                 rightBack.setTargetPosition((int) -counts);
                 break;
         }
+
         /*leftFront.setTargetPosition(target);
         leftBack.setTargetPosition(target);
         rightFront.setTargetPosition(target);
@@ -143,6 +142,7 @@ public class AutonEncoders extends LinearOpMode {
                     && !(runtime.seconds() > timeout) ) {
             }
         }
+
 
         stop(leftFront, rightFront, leftBack, rightBack);
 

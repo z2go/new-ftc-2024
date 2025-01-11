@@ -22,10 +22,10 @@ public class Auto extends OpMode {
     public void init() {
         power = 0.15;
 
-        frontLeft = hardwareMap.get(DcMotor.class,"fl");
-        frontRight = hardwareMap.get(DcMotor.class,"fr");
-        backLeft = hardwareMap.get(DcMotor.class,"bl");
-        backRight = hardwareMap.get(DcMotor.class,"br");
+        frontLeft = hardwareMap.get(DcMotor.class,"frontLeft");
+        frontRight = hardwareMap.get(DcMotor.class,"frontRight");
+        backLeft = hardwareMap.get(DcMotor.class,"backLeft");
+        backRight = hardwareMap.get(DcMotor.class,"backRight");
 
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.FORWARD);

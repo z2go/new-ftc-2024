@@ -70,10 +70,10 @@ public class AdvancedTele extends OpMode {
 
 
         // TODO: Initialize motors and servos here
-        frontLeft = hardwareMap.get(DcMotor.class,"frontLeft");
-        frontRight = hardwareMap.get(DcMotor.class,"frontRight");
-        backLeft = hardwareMap.get(DcMotor.class,"backLeft");
-        backRight = hardwareMap.get(DcMotor.class,"backRight");
+        frontLeft = hardwareMap.get(DcMotor.class,"fl");
+        frontRight = hardwareMap.get(DcMotor.class,"fr");
+        backLeft = hardwareMap.get(DcMotor.class,"bl");
+        backRight = hardwareMap.get(DcMotor.class,"br");
 
 
         rightSlide = hardwareMap.get(DcMotor.class, "rightLift");
@@ -136,88 +136,88 @@ public class AdvancedTele extends OpMode {
         double turn = gamepad1.right_stick_x;
 
         servoIsActivated = gamepad1.a;
-        //claw.setPosition(servoIsActivated?1:0);
+        specimenServo.setPosition(servoIsActivated?1:0);
 
         if (gamepad1.b) {
             //launcher.setPosition(-1);
         }
 
-        if (gamepad1.a) {
-
-            if (halfPower) {
-                power *= 0.5;
-                strafe *= 0.5;
-                turn *= 0.5;
-            }
-
-            //drive stuff:
-
-            double flPower = power + strafe - turn;
-            double blPower = power - strafe - turn;
-            double frPower = power - strafe + turn;
-            double brPower = power + strafe + turn;
-
-            frontLeft.setPower(flPower);
-            backLeft.setPower(blPower);
-            backRight.setPower(brPower);
-            frontRight.setPower(frPower);
-
-            //slides:
 
 
-            //with limit:
-                /*leftSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : leftTrigger);
-                rightSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : leftTrigger);
-                */
-
-
-            //without extension limit:
-            leftSlide.setPower(leftTrigger - rightTrigger);
-            rightSlide.setPower(leftTrigger - rightTrigger);
-
-
-            //sweep intake (button that continues moving)
-
-            //prev intake stuff:
-                /*if (gamepad1.right_bumper && !lastRightBumper) {
-                    clawClosed = !clawClosed;
-
-                  lastRightBumper = gamepad1.right_bumper;
-                }*/
-
-            if (gamepad1.right_bumper) {
-                sweepOn = !sweepOn;
-            }
-
-
-            intake.setPosition(sweepOn ? 1 : 0);
-
-
-            //changing the angle of the slides:
-            if (gamepad1.dpad_up) {
-                slideUp.setPower(0.4);
-                canExtendSlides = false;
-            } else if (gamepad1.dpad_down) {
-                slideUp.setPower(-0.8);
-                canExtendSlides = true;
-            } else {
-                slideUp.setPower(0);
-            }
-
-            //hanging hooks:
-
-            if (gamepad1.x) {
-                hangLeft.setPosition(1);
-                hangRight.setPosition(1);
-            }
-
-            //unhang:
-
-            if (gamepad1.y) {
-                hangLeft.setPosition(-1);
-                hangRight.setPosition(-1);
-            }
+        if (halfPower) {
+            power *= 0.5;
+            strafe *= 0.5;
+            turn *= 0.5;
         }
+
+        //drive stuff:
+
+        double flPower = power + strafe - turn;
+        double blPower = power - strafe - turn;
+        double frPower = power - strafe + turn;
+        double brPower = power + strafe + turn;
+
+        frontLeft.setPower(flPower);
+        backLeft.setPower(blPower);
+        backRight.setPower(brPower);
+        frontRight.setPower(frPower);
+
+        //slides:
+
+
+        //with limit:
+            /*leftSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : leftTrigger);
+            rightSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : leftTrigger);
+            */
+
+
+        //without extension limit:
+        leftSlide.setPower(leftTrigger - rightTrigger);
+        rightSlide.setPower(leftTrigger - rightTrigger);
+
+
+        //sweep intake (button that continues moving)
+
+        //prev intake stuff:
+            /*if (gamepad1.right_bumper && !lastRightBumper) {
+                clawClosed = !clawClosed;
+
+              lastRightBumper = gamepad1.right_bumper;
+            }*/
+
+        if (gamepad1.right_bumper) {
+            sweepOn = !sweepOn;
+        }
+
+
+        intake.setPosition(sweepOn ? 1 : 0);
+
+
+        //changing the angle of the slides:
+        if (gamepad1.dpad_up) {
+            slideUp.setPower(0.4);
+            canExtendSlides = false;
+        } else if (gamepad1.dpad_down) {
+            slideUp.setPower(-0.8);
+            canExtendSlides = true;
+        } else {
+            slideUp.setPower(0);
+        }
+
+        //hanging hooks:
+
+        if (gamepad1.x) {
+            hangLeft.setPosition(0);
+            hangRight.setPosition(1);
+        }
+
+        //unhang:
+
+        if (gamepad1.y) {
+            hangLeft.setPosition(1);
+            hangRight.setPosition(0);
+        }
+
 
     }
 

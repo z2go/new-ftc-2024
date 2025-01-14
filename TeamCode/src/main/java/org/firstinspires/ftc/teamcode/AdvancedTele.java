@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 
 
 
+import android.print.PrintAttributes;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -29,6 +31,8 @@ public class AdvancedTele extends OpMode {
 
     private DcMotor slideUp;
 
+    private DcMotor extendClaw;
+
     private Servo specimenServo;
 
     private Servo hangRight;
@@ -36,6 +40,10 @@ public class AdvancedTele extends OpMode {
     private Servo hangLeft;
 
     private Servo intake;
+
+    private Servo rotateClaw;
+
+    private Servo claw;
 
     //private DcMotor rightSlide1;
     //private DcMotor rightSlide2;
@@ -50,6 +58,8 @@ public class AdvancedTele extends OpMode {
     //for curr intake:
     private boolean sweepOn = false;
 
+    private double clawRotation = 0.5;
+
     //for prev intake:
     private boolean lastRightBumper = false;
     private boolean clawClosed = false;
@@ -59,6 +69,21 @@ public class AdvancedTele extends OpMode {
     private boolean canExtendSlides = false;
 
     private boolean servoIsActivated = false;
+
+    private boolean lastA;
+    private boolean lastB;
+    private boolean lastX;
+    private boolean lastY;
+    private boolean lastRBumper;
+    private boolean lastLBumper;
+
+    private boolean lastDPadUp;
+    private boolean lastDPadDown;
+    private boolean lastDPadLeft;
+    private boolean lastDPadRight;
+
+
+
     // TODO: Set any constant values here, if necessary
     // Example: private final double MAX_POWER = 1.0;
     private final double MAX_POWER = 1.0;
@@ -90,6 +115,10 @@ public class AdvancedTele extends OpMode {
 
         intake = hardwareMap.get(Servo.class, "sweeper");
 
+        rotateClaw = hardwareMap.get(Servo.class, "rotateClaw");
+        claw = hardwareMap.get(Servo.class,"claw");
+        extendClaw = hardwareMap.get(DcMotor.class, "intakeExtend");
+
 
 
         // TODO: Set motor directions and modes here.
@@ -100,11 +129,18 @@ public class AdvancedTele extends OpMode {
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
 
         leftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightSlide.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        extendClaw.setDirection(DcMotorSimple.Direction.FORWARD);
 
         frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        extendClaw.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
 
 
         // Tell the driver that initialization is complete.
@@ -128,6 +164,7 @@ public class AdvancedTele extends OpMode {
     @Override
     public void loop() {
 
+
         double leftTrigger = gamepad1.left_trigger;
         double rightTrigger = gamepad1.right_trigger;
 
@@ -135,14 +172,8 @@ public class AdvancedTele extends OpMode {
         double strafe = gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x;
 
-        servoIsActivated = gamepad1.a;
-        specimenServo.setPosition(servoIsActivated?1:0);
-
-        if (gamepad1.b) {
-            //launcher.setPosition(-1);
-        }
-
-
+        servoIsActivated = (gamepad1.a && !lastA) != servoIsActivated;
+        specimenServo.setPosition(servoIsActivated?0.4:0);
 
         if (halfPower) {
             power *= 0.5;
@@ -152,73 +183,70 @@ public class AdvancedTele extends OpMode {
 
         //drive stuff:
 
-        double flPower = power + strafe - turn;
-        double blPower = power - strafe - turn;
-        double frPower = power - strafe + turn;
-        double brPower = power + strafe + turn;
+        double flPower = power - strafe - turn;
+        double blPower = power + strafe - turn;
+        double frPower = power + strafe + turn;
+        double brPower = power - strafe + turn;
 
         frontLeft.setPower(flPower);
         backLeft.setPower(blPower);
         backRight.setPower(brPower);
         frontRight.setPower(frPower);
 
-        //slides:
-
-
-        //with limit:
-            /*leftSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : leftTrigger);
-            rightSlide.setPower(canExtendSlides ? leftTrigger-rightTrigger : leftTrigger);
-            */
-
-
-        //without extension limit:
         leftSlide.setPower(leftTrigger - rightTrigger);
         rightSlide.setPower(leftTrigger - rightTrigger);
 
-
-        //sweep intake (button that continues moving)
-
-        //prev intake stuff:
-            /*if (gamepad1.right_bumper && !lastRightBumper) {
-                clawClosed = !clawClosed;
-
-              lastRightBumper = gamepad1.right_bumper;
-            }*/
-
-        if (gamepad1.right_bumper) {
+        if (gamepad2.left_bumper && !lastLBumper) {
             sweepOn = !sweepOn;
         }
 
-
         intake.setPosition(sweepOn ? 1 : 0);
 
+        if (gamepad2.right_bumper && !lastRBumper){
+            clawClosed = !clawClosed;
+        }
+        claw.setPosition(clawClosed ? 1 : 0.2);
 
         //changing the angle of the slides:
-        if (gamepad1.dpad_up) {
-            slideUp.setPower(0.4);
-            canExtendSlides = false;
-        } else if (gamepad1.dpad_down) {
-            slideUp.setPower(-0.8);
-            canExtendSlides = true;
-        } else {
-            slideUp.setPower(0);
+        slideUp.setPower(gamepad2.left_stick_y);
+
+        extendClaw.setPower(-gamepad2.right_stick_y);
+
+        if (gamepad2.dpad_right){
+            clawRotation-=0.002;
         }
+        else if(gamepad2.dpad_left){
+            clawRotation += 0.002;
+        }
+        clawRotation = Math.max(Math.min(1,clawRotation),-1);
+        rotateClaw.setPosition(clawRotation);
 
         //hanging hooks:
 
-        if (gamepad1.x) {
+        if (gamepad1.x && !lastX) {
             hangLeft.setPosition(0);
             hangRight.setPosition(1);
         }
 
         //unhang:
 
-        if (gamepad1.y) {
-            hangLeft.setPosition(1);
-            hangRight.setPosition(0);
+        if (gamepad1.y && !lastY) {
+            hangLeft.setPosition(0.8);
+            hangRight.setPosition(0.2);
         }
 
+        lastA = gamepad1.a;
+        lastB = gamepad1.b;
+        lastX = gamepad1.x;
+        lastY = gamepad1.y;
 
+        lastRBumper = gamepad2.right_bumper;
+        lastLBumper = gamepad2.left_bumper;
+
+        lastDPadDown = gamepad1.dpad_down;
+        lastDPadUp = gamepad1.dpad_up;
+        lastDPadLeft = gamepad1.dpad_left;
+        lastDPadRight = gamepad1.dpad_right;
     }
 
 

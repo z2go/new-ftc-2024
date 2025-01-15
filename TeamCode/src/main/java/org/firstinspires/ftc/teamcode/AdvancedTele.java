@@ -95,10 +95,10 @@ public class AdvancedTele extends OpMode {
 
 
         // TODO: Initialize motors and servos here
-        frontLeft = hardwareMap.get(DcMotor.class,"fl");
-        frontRight = hardwareMap.get(DcMotor.class,"fr");
-        backLeft = hardwareMap.get(DcMotor.class,"bl");
-        backRight = hardwareMap.get(DcMotor.class,"br");
+        frontLeft = hardwareMap.get(DcMotor.class,"leftFront");
+        frontRight = hardwareMap.get(DcMotor.class,"rightFront");
+        backLeft = hardwareMap.get(DcMotor.class,"leftBack");
+        backRight = hardwareMap.get(DcMotor.class,"rightBack");
 
 
         rightSlide = hardwareMap.get(DcMotor.class, "rightLift");
@@ -208,7 +208,7 @@ public class AdvancedTele extends OpMode {
         claw.setPosition(clawClosed ? 1 : 0.2);
 
         //changing the angle of the slides:
-        slideUp.setPower(gamepad2.left_stick_y);
+        slideUp.setPower(gamepad2.left_stick_y+0.1);
 
         extendClaw.setPower(-gamepad2.right_stick_y);
 
@@ -218,7 +218,7 @@ public class AdvancedTele extends OpMode {
         else if(gamepad2.dpad_left){
             clawRotation += 0.002;
         }
-        clawRotation = Math.max(Math.min(1,clawRotation),-1);
+        clawRotation = Math.max(Math.min(1,clawRotation),0);
         rotateClaw.setPosition(clawRotation);
 
         //hanging hooks:

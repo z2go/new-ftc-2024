@@ -50,3 +50,5 @@ public class Auto extends OpMode {
         frontRight.setPower(frPower);
     }
 }
+
+

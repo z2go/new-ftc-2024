@@ -104,7 +104,7 @@ public class AdvancedTele extends OpMode {
         rightSlide = hardwareMap.get(DcMotor.class, "rightLift");
         leftSlide = hardwareMap.get(DcMotor.class, "leftLift");
 
-        slideUp = hardwareMap.get(DcMotor.class, "slideAngle");
+        slideUp = hardwareMap.get(DcMotor.class, "slideAngleAxial");
 
         specimenServo = hardwareMap.get(Servo.class, "specServo");
 
@@ -117,7 +117,7 @@ public class AdvancedTele extends OpMode {
 
         rotateClaw = hardwareMap.get(Servo.class, "rotateClaw");
         claw = hardwareMap.get(Servo.class,"claw");
-        extendClaw = hardwareMap.get(DcMotor.class, "intakeExtend");
+        extendClaw = hardwareMap.get(DcMotor.class, "intakeExtendLateral");
 
 
 
@@ -200,15 +200,15 @@ public class AdvancedTele extends OpMode {
             sweepOn = !sweepOn;
         }
 
-        intake.setPosition(sweepOn ? 1 : 0);
+        intake.setPosition(sweepOn ? 0.6  : 0);
 
         if (gamepad2.right_bumper && !lastRBumper){
             clawClosed = !clawClosed;
         }
-        claw.setPosition(clawClosed ? 1 : 0.2);
+        claw.setPosition(clawClosed ? 1 : 0.1);
 
         //changing the angle of the slides:
-        slideUp.setPower(gamepad2.left_stick_y+0.1);
+        slideUp.setPower(-gamepad2.left_stick_y+0.1);
 
         extendClaw.setPower(-gamepad2.right_stick_y);
 

@@ -5,6 +5,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.print.PrintAttributes;
 
+import com.acmerobotics.roadrunner.ftc.Encoder;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,7 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
+import java.util.Base64;
 
 
 @TeleOp(name="AdvancedTele", group="Iterative Opmode")

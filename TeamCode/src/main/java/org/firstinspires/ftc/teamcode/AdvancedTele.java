@@ -69,7 +69,7 @@ public class AdvancedTele extends OpMode {
 
     private boolean canExtendSlides = false;
 
-    private boolean servoIsActivated = false;
+    private boolean servoIsActivated = true;
 
     private boolean lastA;
     private boolean lastB;
@@ -206,7 +206,7 @@ public class AdvancedTele extends OpMode {
         if (gamepad2.right_bumper && !lastRBumper){
             clawClosed = !clawClosed;
         }
-        claw.setPosition(clawClosed ? 1 : 0.1);
+        claw.setPosition(clawClosed ? 0.6 : 0.1);
 
         //changing the angle of the slides:
         slideUp.setPower(-gamepad2.left_stick_y+0.1);

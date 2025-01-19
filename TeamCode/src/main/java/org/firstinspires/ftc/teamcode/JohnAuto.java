@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -33,10 +34,19 @@ public class JohnAuto extends LinearOpMode {
 
     private boolean clawOpen;
 
+    Pose2d beginPose;
+
+    MecanumDrive drive;
+
+    Servo hangRight;
+    Servo hangLeft;
+
     @Override
     public void runOpMode() {
+        Pose2d beginPose = new Pose2d(0,0,0);
+        MecanumDrive drive = new MecanumDrive(hardwareMap,beginPose);
 
-        clawOpen = true;
+        clawOpen = false;
 
 
         rightSlide = hardwareMap.get(DcMotor.class, "rightLift");
@@ -54,6 +64,10 @@ public class JohnAuto extends LinearOpMode {
         claw = hardwareMap.get(Servo.class,"claw");
         extendClaw = hardwareMap.get(DcMotor.class, "intakeExtendLateral");
 
+        hangRight = hardwareMap.get(Servo.class, "hangRight");
+
+        hangLeft = hardwareMap.get(Servo.class, "hangLeft");
+
 
         leftSlide.setDirection(DcMotorSimple.Direction.REVERSE);
         rightSlide.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -62,29 +76,57 @@ public class JohnAuto extends LinearOpMode {
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         waitForStart();
+
+
         //TODO PUT YOUR AUTO CODE BELOW THIS LINE
 
         //1. Raise slides to place spec
+        hangLeft.setPosition(0);
+        hangRight.setPosition(1);
 
-        //raiseSlides(x);
+        raiseSlides(6000);
+
+        Actions.runBlocking(
+                drive.actionBuilder(beginPose)
+                        .splineTo(new Vector2d(20, 5), 0)
+                        .build());
+
+        //raiseSlides(7000);
+
+        //toggleClaw();
+
+
+
+
+
+
+
 
         //2. Go up to bars to place spec
 
 
 
+
         //3. Place spec
 
-        //raiseSlides(x);
-        //toggleClaw();
 
 
         //4. Fully retract slides
 
+
+
         //raiseSlides(-currentSLidesPos);
 
         //5a. Park and end
+        /*
+        Actions.runBlocking(
+                drive.actionBuilder(beginPose)
+                        .splineTo(new Vector2d(-5, 0), 0)
+                        .splineTo(new Vector2d(5, -50), 0)
+                        .build()
+        );
+        */
 
-        //
 
         //5b. Drive around to behind sample
 
@@ -105,18 +147,21 @@ public class JohnAuto extends LinearOpMode {
 
         //10. Park(END)
 
-        // Roadrunner Pathing Planning
-            /*
-            Actions.runBlocking(
-                    drive.actionBuilder(beginPose)
-                            .splineTo(new Vector2d(10, 10), Math.PI / 2) // Adjust path as needed
-                            .build()
-            );
 
-             */
+
+        /*
+        Actions.runBlocking(
+                drive.actionBuilder(beginPose)
+                        .splineTo(new Vector2d(10, 10), Math.PI / 2)
+                        .build()
+        );
+
+         */
 
     }
+    public void move(int x, int y, int rotation, Pose2d pose){
 
+    }
 
     public void raiseSlides(int amount){
         int amt = currentSlidesPos - amount;

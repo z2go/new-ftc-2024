@@ -64,7 +64,46 @@ public class JohnAuto extends LinearOpMode {
         waitForStart();
         //TODO PUT YOUR AUTO CODE BELOW THIS LINE
 
-       
+        //1. Raise slides to place spec
+
+        //raiseSlides(x);
+
+        //2. Go up to bars to place spec
+
+
+
+        //3. Place spec
+
+        //raiseSlides(x);
+        //toggleClaw();
+
+
+        //4. Fully retract slides
+
+        //raiseSlides(-currentSLidesPos);
+
+        //5a. Park and end
+
+        //
+
+        //5b. Drive around to behind sample
+
+        //
+
+        //6. Push sample into observation zone
+
+        //
+
+        //7. Back out of Zone and wait for 3-5 secs
+
+        //
+        //sleep(4000);
+
+        //8. Back into Zone and hit wall
+
+        //9. Place Spec on wall
+
+        //10. Park(END)
 
         // Roadrunner Pathing Planning
             /*

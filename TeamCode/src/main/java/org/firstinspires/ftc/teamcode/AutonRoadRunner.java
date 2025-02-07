@@ -25,10 +25,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Autonomous(name="AutonRoadRunner", group="Autonomous")
 public class AutonRoadRunner extends LinearOpMode {
-    private DcMotor frontLeft;
-    private DcMotor frontRight;
-    private DcMotor backLeft;
-    private DcMotor backRight;
+
     public class Lift {
         private DcMotorEx lift;
 
@@ -133,53 +130,35 @@ public class AutonRoadRunner extends LinearOpMode {
         //diagonal going to specimen bar
         TrajectoryActionBuilder goingTo = drive.actionBuilder(initialPose)
                 .strafeTo(new Vector2d(-25, -36))
-                //.turn(Math.PI)
+                .turn(Math.PI)
                 .waitSeconds(2);
 
         TrajectoryActionBuilder goingForward = drive.actionBuilder(initialPose)
-                // STRAFEWORKS, BUT TRYING A DIFFERENT WAY
-                // .strafeTo(new Vector2d(25, 0))
-                .lineToX(20)
+                .strafeTo(new Vector2d(25, 0))
                 .waitSeconds(2);
 
         // diagonal going back to loading area
-        TrajectoryActionBuilder turning = drive.actionBuilder(initialPose)
-                .turn(Math.PI);
-
         TrajectoryActionBuilder goingBack = drive.actionBuilder(initialPose)
-
-                .strafeTo(new Vector2d(0, -20))
+                .strafeTo(new Vector2d (0,0))
+                .turn(Math.PI)
                 .waitSeconds(2);
 
         //parking:
         Action parking = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(0, -40))
+                .strafeTo(new Vector2d(0, -20))
                 .build();
 
-        telemetry.addData("Starting", "Setup Complete");
-        telemetry.update();
-        waitForStart();
-
-        if(isStopRequested()) return;
-
-
-        //forward works
-
-        Action goForward = goingForward.build();
-        Action diagonalToward = goingTo.build();
-        Action diagonalBack = goingBack.build();
-        Action turn = turning.build();
+        Action Action1 = goingForward.build();
+        Action Action2 = goingTo.build();
+        Action Action3 = goingBack.build();
 
 
         Actions.runBlocking(
                 new SequentialAction(
                         //put the lift and claw stuff in between action 1 and 2
-                        goForward,
-                        turn,
-                        diagonalBack,
-                        turn,
-                        diagonalToward,
-                        turn,
+                        Action1,
+                        Action3,
+                        Action2,
                         parking
                 )
         );

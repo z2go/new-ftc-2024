@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 
+
+
 import androidx.annotation.NonNull;
 
+
 // RR-specific imports
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -13,157 +15,485 @@ import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 
+
 // Non-RR imports
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import org.firstinspires.ftc.teamcode.MecanumDrive;
+
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 
 @Autonomous(name="AutonRoadRunner", group="Autonomous")
 public class AutonRoadRunner extends LinearOpMode {
+    public static class Hooks{
+        public Hooks(HardwareMap hardwareMap){
+            Servo leftHook = hardwareMap.get(Servo.class,"hangLeft");
+            Servo rightHook = hardwareMap.get(Servo.class, "hangRight");
+        }
+    }
+    public static class Lift {
 
-    public class Lift {
-        private DcMotorEx lift;
+
+
 
         public Lift(HardwareMap hardwareMap) {
-            lift = hardwareMap.get(DcMotorEx.class, "leftLift");
-            lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            lift.setDirection(DcMotorSimple.Direction.FORWARD);
+
+
+
+
+            DcMotorEx leftLift;
+            DcMotorEx rightLift;
+
+
+            leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
+            rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
+
+
+            leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+            leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+            rightLift.setDirection(DcMotorSimple.Direction.FORWARD);
         }
 
-        public class LiftUp implements Action {
+
+        public static class LiftUp implements Action {
             private boolean initialized = false;
+
+
+            public static DcMotorEx leftLift;
+            public static DcMotorEx rightLift;
+
+
+
+
+            static Telemetry telemetry;
+
+
+
+
+
+
+
+
+            LiftUp(@NonNull HardwareMap hardwareMap, Telemetry tel){
+                leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
+                leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+                rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
+                telemetry = tel;
+
+
+            }
+
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    lift.setPower(0.5);
+                    leftLift.setPower(0.8);
+                    rightLift.setPower(0.8);
                     initialized = true;
                 }
 
-                double pos = lift.getCurrentPosition();
-                packet.put("liftPos", pos);
-                if (pos < 1000.0) {
+
+                double pos = (double) leftLift.getCurrentPosition() /2 + (double) rightLift.getCurrentPosition() /2;
+                telemetry.addData("liftPos", pos);
+                if (pos < 2400.0) {
                     return true;
                 } else {
-                    lift.setPower(0);
+                    leftLift.setPower(0);
+                    rightLift.setPower(0);
                     return false;
                 }
             }
 
 
-            public Action liftUp() {
-                return new LiftUp();
-            }
+
 
         }
-        public class LiftDown implements Action {
+
+
+        public static Action liftUp(HardwareMap map, Telemetry telemetry) {
+            return new LiftUp(map,telemetry);
+        }
+        public static class miniRaise implements Action {
             private boolean initialized = false;
+
+
+            public static DcMotorEx leftLift;
+            public static DcMotorEx rightLift;
+
+
+
+
+            static Telemetry telemetry;
+
+
+
+
+
+
+
+
+            miniRaise(@NonNull HardwareMap hardwareMap, Telemetry tel){
+                leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
+                leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+                rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
+                telemetry = tel;
+
+
+            }
+
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    lift.setPower(-0.8);
+                    leftLift.setPower(0.8);
+                    rightLift.setPower(0.8);
                     initialized = true;
                 }
 
-                double pos = lift.getCurrentPosition();
-                packet.put("liftPos", pos);
+
+                double pos = (double) leftLift.getCurrentPosition() /2 + (double) rightLift.getCurrentPosition() /2;
+                telemetry.addData("liftPos", pos);
+                if (pos < 100.0) {
+                    return true;
+                } else {
+                    leftLift.setPower(0);
+                    rightLift.setPower(0);
+                    return false;
+                }
+            }
+
+
+
+
+        }
+
+
+        public static Action miniRaise(HardwareMap map, Telemetry telemetry) {
+            return new miniRaise(map,telemetry);
+        }
+
+
+        public static class LiftDown2 implements Action {
+            private boolean initialized = false;
+
+
+            public static DcMotorEx leftLift;
+            public static DcMotorEx rightLift;
+
+
+            Telemetry telemetry;
+
+
+            LiftDown2(HardwareMap hardwareMap, Telemetry tel){
+                leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
+                leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+                rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
+                telemetry = tel;
+            }
+
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    leftLift.setPower(-0.8);
+                    rightLift.setPower(-0.8);
+                    initialized = true;
+                }
+
+
+                double pos = (double) leftLift.getCurrentPosition() /2+ (double) rightLift.getCurrentPosition() /2;
+                telemetry.addData("Position ",pos);
+                if (pos > 0) {
+                    return true;
+                } else {
+                    leftLift.setPower(0);
+                    rightLift.setPower(0);
+                    return false;
+                }
+            }
+        }
+        public static Action liftDown2(HardwareMap map, Telemetry telemetry){
+            return new LiftDown2(map,telemetry);
+        }
+        public static class LiftDown1 implements Action {
+            private boolean initialized = false;
+
+
+            public static DcMotorEx leftLift;
+            public static DcMotorEx rightLift;
+
+
+            Telemetry telemetry;
+
+
+            LiftDown1(HardwareMap hardwareMap, Telemetry tel){
+                leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
+                leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+                rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
+                telemetry = tel;
+            }
+
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    leftLift.setPower(-0.8);
+                    rightLift.setPower(-0.8);
+                    initialized = true;
+                }
+
+
+                double pos = (double) leftLift.getCurrentPosition() /2+ (double) rightLift.getCurrentPosition() /2;
+                telemetry.addData("Position ",pos);
+                if (pos > 1200.0) {
+                    return true;
+                } else {
+                    leftLift.setPower(0);
+                    rightLift.setPower(0);
+                    return false;
+                }
+            }
+        }
+        public static Action liftDown1(HardwareMap map, Telemetry telemetry){
+            return new LiftDown1(map,telemetry);
+        }
+        public static class miniLower implements Action {
+            private boolean initialized = false;
+
+
+            public static DcMotorEx leftLift;
+            public static DcMotorEx rightLift;
+
+
+            Telemetry telemetry;
+
+
+            miniLower(HardwareMap hardwareMap, Telemetry tel){
+                leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
+                leftLift.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+                rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
+                telemetry = tel;
+            }
+
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    leftLift.setPower(-0.8);
+                    rightLift.setPower(-0.8);
+                    initialized = true;
+                }
+
+
+                double pos = (double) leftLift.getCurrentPosition() /2+ (double) rightLift.getCurrentPosition() /2;
+                telemetry.addData("Position ",pos);
                 if (pos > 100.0) {
                     return true;
                 } else {
-                    lift.setPower(0);
+                    leftLift.setPower(0);
+                    rightLift.setPower(0);
                     return false;
                 }
             }
         }
-        public Action liftDown(){
-            return new LiftDown();
+        public static Action miniLower(HardwareMap map, Telemetry telemetry){
+            return new miniLower(map,telemetry);
         }
     }
+    public static class Claw {
+        private final Servo claw;
 
-    public class Claw {
-        private Servo claw;
 
-        public Claw(HardwareMap hardwareMap) {
+
+
+        public Claw(@NonNull HardwareMap hardwareMap) {
             claw = hardwareMap.get(Servo.class, "specServo");
+
+
         }
+
 
         public class CloseClaw implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 claw.setPosition(0.4);
+
+
                 return false;
             }
         }
+
+
         public Action closeClaw() {
             return new CloseClaw();
         }
+
 
         public class OpenClaw implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 claw.setPosition(0);
+
+
                 return false;
             }
         }
         public Action openClaw() {
             return new OpenClaw();
         }
+
+
+
+
     }
+
+
 
 
     @Override
     public void runOpMode() {
-
+        telemetry.addData("hello",1);
         // instantiate your MecanumDrive at a particular pose.
         //ROBOT STARTS BACKWARDS
         //note: positive is forward left, y is side to side and x is front and back
 
+
         Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
-        //diagonal going to specimen bar
-        TrajectoryActionBuilder goingTo = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(-25, -36))
-                .turn(Math.PI)
-                .waitSeconds(2);
 
-        TrajectoryActionBuilder goingForward = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(25, 0))
-                .waitSeconds(2);
+        //diagonal going to specimen bar
+        TrajectoryActionBuilder approachChamber = drive.actionBuilder(initialPose)
+                .strafeTo(new Vector2d(-26, 0))
+                .waitSeconds(0.4);
+
 
         // diagonal going back to loading area
-        TrajectoryActionBuilder goingBack = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d (0,0))
-                .turn(Math.PI)
-                .waitSeconds(2);
+        TrajectoryActionBuilder turning = drive.actionBuilder(initialPose)
+                .turn(Math.PI);
 
-        //parking:
-        Action parking = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(0, -20))
-                .build();
 
-        Action Action1 = goingForward.build();
-        Action Action2 = goingTo.build();
-        Action Action3 = goingBack.build();
+        TrajectoryActionBuilder finalAdjust = drive.actionBuilder(initialPose)
+                .strafeTo(new Vector2d(-30,0))
+                .waitSeconds(0.4);
+
+
+        TrajectoryActionBuilder backUp = drive.actionBuilder(initialPose)
+                .strafeTo(new Vector2d(-10,0))
+                .waitSeconds(0.4);
+
+
+        TrajectoryActionBuilder moveToOZ = drive.actionBuilder(initialPose)
+                .strafeTo(new Vector2d(-10,0))
+                .strafeTo(new Vector2d(-10,50))
+                .turn(Math.toRadians(180))
+                .waitSeconds(0.4)
+                .strafeTo(new Vector2d(0,50));
+
+
+        TrajectoryActionBuilder backFromOZ = drive.actionBuilder(initialPose)
+                .strafeTo(new Vector2d(50,10));
+
+
+        TrajectoryActionBuilder goToChambers2 = drive.actionBuilder(initialPose)
+                .strafeTo(new Vector2d(-20,0))
+                .strafeTo(new Vector2d(-26,0))
+                .turn(Math.toRadians(180));
+
+
+        telemetry.addData("Starting", "Setup Complete");
+        telemetry.update();
+        waitForStart();
+
+
+        if(isStopRequested()) return;
+
+
+
+
+        //forward works
+        Claw claw = new Claw(hardwareMap);
+
+
+        Action action1 = approachChamber.build();
+        Action liftUp = Lift.liftUp(hardwareMap,telemetry);
+        Action liftDown1 = Lift.liftDown1(hardwareMap,telemetry);
+        Action liftDown2 = Lift.liftDown2(hardwareMap,telemetry);
+        Action stepForward = finalAdjust.build();
+        Action clawOpen = claw.openClaw();
+        Action clawClose = claw.closeClaw();
+        Action moveToObservationZone = moveToOZ.build();
+        Action back = backUp.build();
+        Action smallRaise = Lift.miniRaise(hardwareMap,telemetry);
+        Action smallLower = Lift.miniLower(hardwareMap,telemetry);
+        Action backUpObservationZone = backFromOZ.build();
+        Action goBackToChambers2 = goToChambers2.build();
+
+
+
+
+        Action turn = turning.build();
+
+
+
+
 
 
         Actions.runBlocking(
                 new SequentialAction(
-                        //put the lift and claw stuff in between action 1 and 2
-                        Action1,
-                        Action3,
-                        Action2,
-                        parking
+                        clawClose,
+                        action1,
+                        liftUp,
+                        stepForward,
+                        liftDown1,
+                        clawOpen,
+                        back,
+                        liftDown2,
+                        moveToObservationZone,
+                        clawClose,
+                        smallRaise,
+                        backUpObservationZone,
+                        smallLower,
+                        goBackToChambers2//,
+                        //liftUp,
+                        //stepForward,
+                        //liftDown1,
+                        //clawOpen,
+                        //back,
+                        //liftDown2
+
+
                 )
         );
 
-        }
+
+        //😖
 
 
     }
+
+
+
+
+}
+
+

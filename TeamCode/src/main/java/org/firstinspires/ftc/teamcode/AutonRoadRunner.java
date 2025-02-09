@@ -32,10 +32,26 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Autonomous(name="AutonRoadRunner", group="Autonomous")
 public class AutonRoadRunner extends LinearOpMode {
     public static class Hooks{
+        static Servo leftHook;
+        static Servo rightHook;
         public Hooks(HardwareMap hardwareMap){
-            Servo leftHook = hardwareMap.get(Servo.class,"hangLeft");
-            Servo rightHook = hardwareMap.get(Servo.class, "hangRight");
+            leftHook = hardwareMap.get(Servo.class,"hangLeft");
+            rightHook = hardwareMap.get(Servo.class, "hangRight");
         }
+
+        public static class HooksUp implements Action{
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                leftHook.setPosition(0.8);
+                rightHook.setPosition(0.2);
+                return false;
+            }
+        }
+        public Action hooksUp(){
+            return new HooksUp();
+        }
+
     }
     public static class Lift {
 
@@ -71,16 +87,7 @@ public class AutonRoadRunner extends LinearOpMode {
             public static DcMotorEx leftLift;
             public static DcMotorEx rightLift;
 
-
-
-
             static Telemetry telemetry;
-
-
-
-
-
-
 
 
             LiftUp(@NonNull HardwareMap hardwareMap, Telemetry tel){
@@ -166,7 +173,7 @@ public class AutonRoadRunner extends LinearOpMode {
 
                 double pos = (double) leftLift.getCurrentPosition() /2 + (double) rightLift.getCurrentPosition() /2;
                 telemetry.addData("liftPos", pos);
-                if (pos < 100.0) {
+                if (pos < 300.0) {
                     return true;
                 } else {
                     leftLift.setPower(0);
@@ -306,7 +313,7 @@ public class AutonRoadRunner extends LinearOpMode {
 
                 double pos = (double) leftLift.getCurrentPosition() /2+ (double) rightLift.getCurrentPosition() /2;
                 telemetry.addData("Position ",pos);
-                if (pos > 100.0) {
+                if (pos > 0) {
                     return true;
                 } else {
                     leftLift.setPower(0);
@@ -321,9 +328,6 @@ public class AutonRoadRunner extends LinearOpMode {
     }
     public static class Claw {
         private final Servo claw;
-
-
-
 
         public Claw(@NonNull HardwareMap hardwareMap) {
             claw = hardwareMap.get(Servo.class, "specServo");
@@ -382,42 +386,49 @@ public class AutonRoadRunner extends LinearOpMode {
 
 
         //diagonal going to specimen bar
-        TrajectoryActionBuilder approachChamber = drive.actionBuilder(initialPose)
+        TrajectoryActionBuilder driveTowardsChamber = drive.actionBuilder(initialPose)
                 .strafeTo(new Vector2d(-26, 0))
-                .waitSeconds(0.4);
-
-
-        // diagonal going back to loading area
-        TrajectoryActionBuilder turning = drive.actionBuilder(initialPose)
-                .turn(Math.PI);
+                .waitSeconds(0.1);
 
 
         TrajectoryActionBuilder finalAdjust = drive.actionBuilder(initialPose)
                 .strafeTo(new Vector2d(-30,0))
-                .waitSeconds(0.4);
+                .waitSeconds(0.2);
 
 
         TrajectoryActionBuilder backUp = drive.actionBuilder(initialPose)
                 .strafeTo(new Vector2d(-10,0))
-                .waitSeconds(0.4);
+                .waitSeconds(0.2);
 
 
         TrajectoryActionBuilder moveToOZ = drive.actionBuilder(initialPose)
                 .strafeTo(new Vector2d(-10,0))
                 .strafeTo(new Vector2d(-10,50))
                 .turn(Math.toRadians(180))
-                .waitSeconds(0.4)
+                .waitSeconds(0.2)
                 .strafeTo(new Vector2d(0,50));
 
 
         TrajectoryActionBuilder backFromOZ = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(50,10));
+                .strafeTo(new Vector2d(-10,50));
 
 
         TrajectoryActionBuilder goToChambers2 = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(-20,0))
-                .strafeTo(new Vector2d(-26,0))
-                .turn(Math.toRadians(180));
+
+                .strafeTo(new Vector2d(-15,5))
+                .turn(Math.toRadians(180))
+                .strafeTo(new Vector2d(-26,5));
+
+        TrajectoryActionBuilder finalAdjust2 = drive.actionBuilder(initialPose)
+                .strafeTo(new Vector2d(-30,5))
+                .waitSeconds(0.2);
+
+        TrajectoryActionBuilder backUp2 = drive.actionBuilder(initialPose)
+                .strafeTo(new Vector2d(-10,5))
+                .waitSeconds(0.2);
+
+        TrajectoryActionBuilder parkInOZ = drive.actionBuilder(initialPose)
+                .strafeTo(new Vector2d(-5,55));
 
 
         telemetry.addData("Starting", "Setup Complete");
@@ -432,9 +443,10 @@ public class AutonRoadRunner extends LinearOpMode {
 
         //forward works
         Claw claw = new Claw(hardwareMap);
+        Hooks hooks = new Hooks(hardwareMap);
 
 
-        Action action1 = approachChamber.build();
+        Action approachChamber = driveTowardsChamber.build();
         Action liftUp = Lift.liftUp(hardwareMap,telemetry);
         Action liftDown1 = Lift.liftDown1(hardwareMap,telemetry);
         Action liftDown2 = Lift.liftDown2(hardwareMap,telemetry);
@@ -447,21 +459,17 @@ public class AutonRoadRunner extends LinearOpMode {
         Action smallLower = Lift.miniLower(hardwareMap,telemetry);
         Action backUpObservationZone = backFromOZ.build();
         Action goBackToChambers2 = goToChambers2.build();
-
-
-
-
-        Action turn = turning.build();
-
-
-
-
+        Action raiseHooks = hooks.hooksUp();
+        Action stepForward2 = finalAdjust2.build();
+        Action back2 = backUp2.build();
+        Action park = parkInOZ.build();
 
 
         Actions.runBlocking(
                 new SequentialAction(
+                        raiseHooks,
                         clawClose,
-                        action1,
+                        approachChamber,
                         liftUp,
                         stepForward,
                         liftDown1,
@@ -473,13 +481,14 @@ public class AutonRoadRunner extends LinearOpMode {
                         smallRaise,
                         backUpObservationZone,
                         smallLower,
-                        goBackToChambers2//,
-                        //liftUp,
-                        //stepForward,
-                        //liftDown1,
-                        //clawOpen,
-                        //back,
-                        //liftDown2
+                        goBackToChambers2,
+                        liftUp,
+                        stepForward2,
+                        liftDown1,
+                        clawOpen,
+                        back2,
+                        liftDown2,
+                        park
 
 
                 )
